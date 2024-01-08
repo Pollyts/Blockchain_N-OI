@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import Web3modal from 'web3modal';
 import { Button, Center, Text, Textarea } from "@mantine/core"
+import constants from "../config/constants";
 
 let web3Modal;
 
@@ -69,7 +70,7 @@ export default function Connect(){
 
     async function initialize (){
 
-        const contract = new ethers.Contract(contractAdress, abi, signer);
+        const contract = new ethers.Contract(constants.contractAdress, constants.abi, signer);
         const currentUserAddress = await window.ethereum.request({method: 'eth_accounts'})
 
         setContract(contract)
@@ -79,12 +80,13 @@ export default function Connect(){
     async function sendData(){
 
         if(hasMetamask && isConnected){
-            await contract.setData(dataToChain, currentUserAddress[0])
+            await contract.addItem(1, "TestItem", dataToChain + currentUserAddress[0])
         }
     }
 
     async function getDataFromChain(){
-        const response = await contract.getDataByAddress(currentUserAdress[0])
+        const response = await contract.getItemDetails(1)
+        console.log(response)
 
         let dataArray = []
 
@@ -127,13 +129,14 @@ export default function Connect(){
 
         <Center>
             <div>
-                            {dataFromChain.map((data, index) => (
+                            {dataFromChain!== ''?
+                                dataFromChain.map((data, index) => (
                                 <div key={index}>
                                     <Text>
                                         {data.data}
                                     </Text>
                                 </div>
-                            ))}
+                            )):("")}
                         </div>
         </Center>
 
