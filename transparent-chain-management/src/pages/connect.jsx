@@ -11,6 +11,7 @@ const providerOptions = {
     walletConnect:{
         package: WalletConnectProvider,
         options: {
+            // rpc:{ 11155111: "https://sepolia.infura.io/v3/"}
             rpc:{ 8995: "https://core.bloxberg.org"}
         }
     }
@@ -70,6 +71,8 @@ export default function Connect(){
 
     async function initialize (){
 
+        console.log(constants.contractAdress)
+
         const contract = new ethers.Contract(constants.contractAdress, constants.abi, signer);
         const currentUserAddress = await window.ethereum.request({method: 'eth_accounts'})
 
@@ -80,12 +83,12 @@ export default function Connect(){
     async function sendData(){
 
         if(hasMetamask && isConnected){
-            await contract.addItem(1, "TestItem", dataToChain + currentUserAddress[0])
+            await contract.addItem("TestItem", currentUserAddress[0])
         }
     }
 
     async function getDataFromChain(){
-        const response = await contract.getItemDetails(1)
+        const response = await contract.getItemDetails(currentUserAddress[0])
         console.log(response)
 
         let dataArray = []
@@ -100,23 +103,25 @@ export default function Connect(){
 
     return(
         <div>
-        <Center>
+        <Center style={{display: "flex", justifyContent: "center", height: '100vh'}}>
             {hasMetamask? (
                 isConnected? (
-                    <Center>
+                    <div>
+                    <Center style={{marginBottom: '8px'}}>
                         <Textarea 
                         value={dataToChain}
                         placeholder="store your data to blockchain"
                         label = {"Add data"}
                         onChange={(event) => setDataToChain(event.currentTarget.value)}
-                        />
-
-                        <Button onClick={() => sendData()}> Send data</Button>
-
-                        <Button onClick={() => getDataFromChain()}> Get data</Button>
+                        />                      
 
                         
                     </Center>
+
+<Button style={{marginRight: '4px'}} onClick={() => sendData()}> Send data</Button>
+
+<Button onClick={() => getDataFromChain()}> Get data</Button>
+</div>
                 ): (<Button onClick={() => connect()}>
                 Connect
                 </Button>)                
