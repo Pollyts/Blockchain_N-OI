@@ -1,5 +1,5 @@
 module.exports = {
-    contractAdress: '0xd9145CCE52D386f254917e481eB44e9943F39138',
+    contractAdress: '0xD7ACd2a9FD159E69Bb102A1ca21C9a3e3A5F771B',
     abi: [
         {
             "inputs": [
@@ -30,16 +30,9 @@ module.exports = {
             "name": "getItemDetails",
             "outputs": [
                 {
-                    "components": [
-                        {
-                            "internalType": "string",
-                            "name": "name",
-                            "type": "string"
-                        }
-                    ],
-                    "internalType": "struct SupplyChainManagementTSPO.Item[]",
+                    "internalType": "int256",
                     "name": "",
-                    "type": "tuple[]"
+                    "type": "int256"
                 }
             ],
             "stateMutability": "view",

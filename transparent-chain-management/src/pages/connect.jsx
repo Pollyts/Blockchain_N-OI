@@ -11,8 +11,9 @@ const providerOptions = {
     walletConnect:{
         package: WalletConnectProvider,
         options: {
-            // rpc:{ 11155111: "https://sepolia.infura.io/v3/"}
-            rpc:{ 8995: "https://core.bloxberg.org"}
+            rpc:{ 11155111: "https://sepolia.infura.io/v3/"}
+            // rpc:{ 8995: "https://core.bloxberg.org"}
+            // rpc:{ 1: "https://mainnet.infura.io/v3/"}
         }
     }
 }
@@ -88,8 +89,9 @@ export default function Connect(){
     }
 
     async function getDataFromChain(){
+        console.log(currentUserAddress[0])
         const response = await contract.getItemDetails(currentUserAddress[0])
-        console.log(response)
+        
 
         let dataArray = []
 
