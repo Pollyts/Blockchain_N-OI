@@ -72,7 +72,7 @@ export default function Connect(){
 
     async function initialize (){
 
-        console.log(constants.contractAdress)
+        //console.log(constants.contractAdress)
 
         const contract = new ethers.Contract(constants.contractAdress, constants.abi, signer);
         const currentUserAddress = await window.ethereum.request({method: 'eth_accounts'})
