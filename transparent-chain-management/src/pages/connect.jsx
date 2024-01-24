@@ -1,153 +1,190 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { ethers } from "ethers";
-import { useEffect, useState } from "react";
-import Web3modal from 'web3modal';
-import { Button, Center, Text, Textarea } from "@mantine/core"
-import constants from "../config/constants";
+import Web3Modal from 'web3modal';
+import {useEffect, useState} from "react";
+import {ethers} from "ethers";
+import {Button, Center, Text, Textarea} from "@mantine/core";
+import {abi, contractAddress} from "../config/constants";
 
 let web3Modal;
 
 const providerOptions = {
-    walletConnect:{
-        package: WalletConnectProvider,
-        options: {
-            rpc:{ 11155111: "https://sepolia.infura.io/v3/"}
-            // rpc:{ 8995: "https://core.bloxberg.org"}
-            // rpc:{ 1: "https://mainnet.infura.io/v3/"}
-        }
+  walletconnect: {
+    package: WalletConnectProvider,
+    options: {
+      rpc: {8995: "https://core.bloxberg.org"}
     }
+  }
 }
 
-if(typeof window != 'undefined'){
-    web3Modal = new Web3modal({
-        cacheProvider:false,
-        providerOptions,
-    })
+if (typeof window != 'undefined') {
+  web3Modal = new Web3Modal({
+    cacheProvider: false,
+    providerOptions,
+  })
 }
 
-export default function Connect(){
+export default function Connect() {
 
-    const [hasMetamask, setHasMetamask] = useState(false);
+  const [hasMetamask, setHasMetamask] = useState(false);
+  const [signer, setSigner] = useState(undefined);
+  const [isConnected, setIsConnected] = useState(false);
 
-    const [signer, setSigner] = useState(undefined);
+  const [contract, setContract] = useState(undefined);
+  const [currentUserAddress, setCurrentUserAddress] = useState('');
 
-    const [isConnected, setIsConnected] = useState(false);
+  const [dataToChain, setDataToChain] = useState('');
+  const [dataFromChain, setDataFromChain] = useState([]);
 
-    const [contract, setContract] = useState(undefined);
 
-    const [currentUserAddress, setCurrentUserAddress] = useState('');
+  useEffect(() => {
+    checkMetamask();
 
-    const [dataToChain, setDataToChain] = useState('');
+    if (isConnected)
+      initialize()
 
-    const [dataFromChain, setDataFromChain] = useState('');
+  })
 
-    useEffect(()=>{
-        checkMetamask();
+  const checkMetamask = () => {
+    if (typeof window.ethereum !== 'undefined') {
+      setHasMetamask(true)
+    } else {
+      setHasMetamask(false)
+    }
+  }
 
-        if(isConnected){
-            initialize()
-        }
-        
+  async function connect() {
+    if (hasMetamask) {
+      const web3ModalProvider = await web3Modal.connect()
+      const provider = new ethers.providers.Web3Provider(web3ModalProvider)
+
+      setSigner(provider.getSigner())
+      setIsConnected(true)
+    }
+  }
+
+  async function initialize () {
+
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    const currentUserAddress = await window.ethereum.request({method: 'eth_accounts'})
+
+    setContract(contract)
+    setCurrentUserAddress(currentUserAddress)
+  }
+
+  async function createParcel() {
+    if (hasMetamask && isConnected) try {
+
+      const transaction = await contract.createParcel(currentUserAddress[0], "Parcel1", "Praha", "Brno", "0x700cc0FE831dFcb65E524101DD3043aD0a008279")
+
+      await transaction.wait();
+
+            // Now listen for the ParcelCreated event
+            //const filter = contract.filters.ParcelCreated();
+            //const events = await contract.queryFilter(filter, transaction.blockHash);
+
+            // Access the parcel code from the event
+            //const parcelCode = events[0].args.parcelCode;
+
+            console.log(transaction);
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async function updateParcelLocation() {
+    if (hasMetamask && isConnected) try {
+
+      await contract.updateParcelLocation(dataToChain, currentUserAddress[0], "Jihlava")
+
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  async function parcelInfo() {
+    if (hasMetamask && isConnected) try {
+      
+    const response = await contract.parcelInfo(dataToChain, currentUserAddress[0])
+    console.log(response);
+
+    let dataArray = []
+    response.forEach((data) => {
+      dataArray.push({data: data[1]})
     })
 
-    const checkMetamask = () => {
-        if (typeof window.ethereum !== 'undefined'){
-            setHasMetamask(true)
-        }
-        else{
-            setHasMetamask(false)
-        }
+    } catch (e) {
+      console.log(e)
     }
+  }
 
-    async function connect(){
-        if(hasMetamask){
-            const web3ModalProvider = await web3Modal.connect()
-            //const provider = new ethers.providers.Web3Provider(web3ModalProvider)
-            const provider = new ethers.providers.Web3Provider(web3ModalProvider);
-
-            setSigner(provider.getSigner())
-            setIsConnected(true)
-        }
+  async function ReceiveParcel() {
+    if (hasMetamask && isConnected) try {
+      console.log(dataToChain, currentUserAddress[0])
+      await contract.submitInsuranceRequest()
+    } catch (e) {
+      console.log(e)
     }
+  }
 
-    async function initialize (){
+  async function getDataFromChain() {
+    const response = await contract.getAllInsuranceRequests()
 
-        //console.log(constants.contractAdress)
+    let dataArray = []
+    response.forEach((data) => {
+      dataArray.push({data: data[1]})
+    })
 
-        const contract = new ethers.Contract(constants.contractAdress, constants.abi, signer);
-        const currentUserAddress = await window.ethereum.request({method: 'eth_accounts'})
+    setDataFromChain(dataArray)
+  }
 
-        setContract(contract)
-        setCurrentUserAddress(currentUserAddress)
-    }
+  return (
+    <Center style={{display: "flex", justifyContent: "center", height: '100vh'}}>
+      {hasMetamask ? (
+        isConnected ? (
 
-    async function sendData(){
+          <div><Center>
 
-        if(hasMetamask && isConnected){
-            await contract.addItem("TestItem", currentUserAddress[0])
-        }
-    }
+            <Textarea
+              value={dataToChain}
+              onChange={(event) => setDataToChain(event.currentTarget.value)}
+              placeholder={"Store your data to blockchain"}
+              label={"Add data"}
+            />
 
-    async function getDataFromChain(){
-        console.log(currentUserAddress[0])
-        const response = await contract.getItemDetails(currentUserAddress[0])
-        
+            <Button onClick={() => createParcel()}>
+              Create parcel
+            </Button>
 
-        let dataArray = []
+            <Button onClick={() => parcelInfo()}>
+              Get parcel
+            </Button>
 
-        response.forEach((data) => {
+            <Button onClick={() => updateParcelLocation()}>
+              Update parcel
+            </Button>
 
-            dataArray.push(data[1])
-        })
+          </Center>
 
-        setDataFromChain(dataArray)
-    }
+            <Center>
 
-    return(
-        <div>
-        <Center style={{display: "flex", justifyContent: "center", height: '100vh'}}>
-            {hasMetamask? (
-                isConnected? (
-                    <div>
-                    <Center style={{marginBottom: '8px'}}>
-                        <Textarea 
-                        value={dataToChain}
-                        placeholder="store your data to blockchain"
-                        label = {"Add data"}
-                        onChange={(event) => setDataToChain(event.currentTarget.value)}
-                        />                      
+              <div>
+                {dataFromChain.map((data, index) => (
+                  <div key={index}>
+                    <Text>{data.data}</Text>
+                  </div>
+                ))}
+              </div>
+            </Center></div>
 
-                        
-                    </Center>
 
-<Button style={{marginRight: '4px'}} onClick={() => sendData()}> Send data</Button>
 
-<Button onClick={() => getDataFromChain()}> Get data</Button>
-</div>
-                ): (<Button onClick={() => connect()}>
-                Connect
-                </Button>)                
-            ): ("Download Metamask!")}
-            {/* Has metamask: {JSON.stringify(hasMetamask)}
-            Has connected: {JSON.stringify(isConnected)} */}
-
-            
-        </Center>
-
-        <Center>
-            <div>
-                            {dataFromChain!== ''?
-                                dataFromChain.map((data, index) => (
-                                <div key={index}>
-                                    <Text>
-                                        {data.data}
-                                    </Text>
-                                </div>
-                            )):("")}
-                        </div>
-        </Center>
-
-        </div>
-                
-    )
+          ) : (
+          <Button onClick={() => connect()}>
+            Connect
+          </Button>
+        )
+      ) : ("Download Metamask! ")}
+    </Center>
+  )
 }
