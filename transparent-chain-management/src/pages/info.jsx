@@ -105,54 +105,27 @@ export default function Connect() {
       
     const response = await contract.parcelInfo(parcelCode, currentUserAddress[0])
 
-    setScreenInfo(
-      `Information about parcel with code ${parcelCode}: \n
-      sender: ${response.sender}\n
-      receiver: ${response.receiver}\n
-      status: ${response.status}\n
-      current location: ${response.currentLocation}\n
-      last update: ${response.lastUpdate}\n
-      from: ${response.from}\n
-      to: ${response.to}\n`);
-    console.log(response);
+    if (response.lastUpdate == ""){
+      setScreenInfo("Parcel not found")
+    }
+    else{
+      setScreenInfo(
+        `Information about parcel with code ${parcelCode}:\n
+        SENDER: ${response.sender}
+        RECEIVER: ${response.receiver}
+        STATUS: ${response.status==0? "Preparing":response.status==1? "Shipping":response.status==2? "Received":"Unknown" }
+        CURRENT LOCATION: ${response.currentLocation}
+        LAST UPDATE: ${response.lastUpdate}
+        FROM: ${response.from}
+        TO: ${response.to}`);
+      console.log(response);
+    }   
     
 
     } catch (e) {
       console.log(e)
     }
-  }
-
-  async function ReceiveParcel() {
-    if (hasMetamask && isConnected) try {
-      console.log(dataToChain, currentUserAddress[0])
-      await contract.submitInsuranceRequest()
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  async function getDataFromChain() {
-    const response = await contract.getAllInsuranceRequests()
-
-    let dataArray = []
-    response.forEach((data) => {
-      dataArray.push({data: data[1]})
-    })
-
-    setDataFromChain(dataArray)
-  }
-
-  function makeid(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
-  }
+  }  
 
   return (
     <Center style={{display: "flex", justifyContent: "center", height: '100vh'}}>
@@ -161,34 +134,23 @@ export default function Connect() {
 
           <div><Center>            
 
-            <Button onClick={() => createParcel()}>
-              Create parcel
-            </Button>
-
-            <div>
-
-            <Button onClick={() => parcelInfo()}>
-              Get parcel
-            </Button>
-
             <Textarea
               value={parcelCode}
               onChange={(event) => setParcelCode(event.currentTarget.value)}
               placeholder={"Write your parcel code"}
               label={"Find information about the parcel"}
-            />
-            </div>
-
-            
-
-            <Button onClick={() => updateParcelLocation()}>
-              Update parcel
-            </Button>
+            />            
 
           </Center>
 
+          <Center style={{marginTop: '20px'}}>
+          <Button onClick={() => parcelInfo()}>
+              Get parcel
+            </Button>
+          </Center>
+
             <Center>
-            <div style={{ width: '500px', marginTop: '50px' }}>
+            <div style={{ width: '500px', marginTop: '20px' }}>
   {screenInfo !== '' ? (
     <Alert variant="light" color="blue" title="Information" style={{ whiteSpace: 'pre-line' }}>
       {screenInfo}

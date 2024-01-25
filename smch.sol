@@ -18,7 +18,7 @@ contract SupplyChainManagement {
         string from;
         string to;
         string currentLocation;
-        uint256 lastUpdate;  
+        string lastUpdate;  
         ParcelStatus status; 
         address receiver;  
         address sender;
@@ -28,7 +28,7 @@ contract SupplyChainManagement {
         address edior;
     }
 
-    mapping(uint => Parcel) public Parcels;
+    mapping(string => Parcel) public Parcels;
     
     modifier onlyOwner() {
         require(msg.sender == owner, "Only the owner can call this function");
@@ -39,29 +39,26 @@ contract SupplyChainManagement {
         owner = msg.sender;
     }
 
-    function createParcel(address _sender, string memory _name, string memory _from, string memory _to, address _receiver) public returns (uint){
-        uint parcelCode = uint(keccak256(abi.encodePacked(_name)));
-        uint256 date = block.timestamp;
-        Parcels[parcelCode] = Parcel(_name, _from, _to, _from, date, ParcelStatus.Preparing, _receiver, _sender);
-        
-        emit ParcelCreated(parcelCode);
-        
-        return parcelCode;
+    function createParcel(string memory _parcelCode, string memory _date, address _sender, string memory _name, string memory _from, string memory _to, address _receiver) public payable{
+        Parcels[_parcelCode] = Parcel(_name, _from, _to, _from, _date, ParcelStatus.Preparing, _receiver, _sender);
     }
 
-    function updateParcelLocation(uint parcelCode, address _editor, string memory _parcelLocation) external payable {
+    function updateParcelLocation(string memory parcelCode, string memory _date, address _editor, string memory _parcelLocation) external payable {
         uint256 date = block.timestamp;
-        Parcels[parcelCode].lastUpdate = date;
+        Parcels[parcelCode].lastUpdate = _date;
         Parcels[parcelCode].status = ParcelStatus.Shipping;
         Parcels[parcelCode].currentLocation = _parcelLocation;
     }
 
-    function receiveParcel(uint parcelCode, address _receiver) external payable {
+    function receiveParcel(string memory parcelCode, string memory _date, address _receiver) external payable {
         Parcels[parcelCode].status = ParcelStatus.Received;
+        Parcels[parcelCode].currentLocation = Parcels[parcelCode].to;
+        Parcels[parcelCode].lastUpdate = _date;
     }
 
-    function parcelInfo(uint parcelCode, address _user) public payable returns (Parcel memory) {
+    function parcelInfo(string memory parcelCode, address _user) public view returns (Parcel memory) {
         return Parcels[parcelCode];
+        //return Parcels[123];
     }
 
     // function parcelsInfo() public payable returns (Parcel [] memory) {

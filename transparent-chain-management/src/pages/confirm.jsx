@@ -32,8 +32,12 @@ export default function Connect() {
   const [contract, setContract] = useState(undefined);
   const [currentUserAddress, setCurrentUserAddress] = useState('');
 
+
+  //parcel data
+
   const [parcelCode, setParcelCode] = useState('');
-  const [dataFromChain, setDataFromChain] = useState([]);
+
+  //end parcel data
 
   const [screenInfo, setScreenInfo] = useState('');
 
@@ -72,75 +76,19 @@ export default function Connect() {
     setCurrentUserAddress(currentUserAddress)
   }
 
-  async function createParcel() {
+  async function confirmParcel() {
     if (hasMetamask && isConnected) try {
 
-      var parcelCode = makeid(16);     
-
-      console.log(parcelCode)
-
-      const transaction = await contract.createParcel(parcelCode, new Date().toLocaleString(), currentUserAddress[0], "Parcel1", "Praha", "Brno", "0x700cc0FE831dFcb65E524101DD3043aD0a008279")
+      const transaction = await contract.receiveParcel(parcelCode, new Date().toLocaleString(), currentUserAddress[0])
 
       console.log(transaction);
 
-      setScreenInfo("Parcel was created. Your Parcel code: " + parcelCode);
+      setScreenInfo("Parcel was received. See more info in the \"Parcel info\" section");
 
     } catch (e) {
       console.log(e)
     }
-  }
-
-  async function updateParcelLocation() {
-    if (hasMetamask && isConnected) try {
-
-      await contract.updateParcelLocation(parcelCode, currentUserAddress[0], "Jihlava")
-
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  async function parcelInfo() {
-    if (hasMetamask && isConnected) try {
-      
-    const response = await contract.parcelInfo(parcelCode, currentUserAddress[0])
-
-    setScreenInfo(
-      `Information about parcel with code ${parcelCode}: \n
-      sender: ${response.sender}\n
-      receiver: ${response.receiver}\n
-      status: ${response.status}\n
-      current location: ${response.currentLocation}\n
-      last update: ${response.lastUpdate}\n
-      from: ${response.from}\n
-      to: ${response.to}\n`);
-    console.log(response);
-    
-
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  async function ReceiveParcel() {
-    if (hasMetamask && isConnected) try {
-      console.log(dataToChain, currentUserAddress[0])
-      await contract.submitInsuranceRequest()
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  async function getDataFromChain() {
-    const response = await contract.getAllInsuranceRequests()
-
-    let dataArray = []
-    response.forEach((data) => {
-      dataArray.push({data: data[1]})
-    })
-
-    setDataFromChain(dataArray)
-  }
+  }  
 
   function makeid(length) {
     let result = '';
@@ -159,31 +107,27 @@ export default function Connect() {
       {hasMetamask ? (
         isConnected ? (
 
-          <div><Center>            
+          <div>
 
-            <Button onClick={() => createParcel()}>
-              Create parcel
-            </Button>
-
-            <div>
-
-            <Button onClick={() => parcelInfo()}>
-              Get parcel
-            </Button>
-
-            <Textarea
+            <Center>
+            <Textarea style={{width: "300px", margin:"8px 0px"}}
               value={parcelCode}
               onChange={(event) => setParcelCode(event.currentTarget.value)}
-              placeholder={"Write your parcel code"}
-              label={"Find information about the parcel"}
-            />
-            </div>
+              placeholder={"Write parcel code"}
+              label={"Parcel code"}
+            />   
+            </Center>     
+            
+            
+          <Center> 
+
+                 
+
+            <Button onClick={() => confirmParcel()}>
+              Confirm parcel
+            </Button>
 
             
-
-            <Button onClick={() => updateParcelLocation()}>
-              Update parcel
-            </Button>
 
           </Center>
 

@@ -33,7 +33,16 @@ export default function Connect() {
   const [currentUserAddress, setCurrentUserAddress] = useState('');
 
   const [parcelCode, setParcelCode] = useState('');
-  const [dataFromChain, setDataFromChain] = useState([]);
+
+
+  //parcel data
+
+  const [parcelName, setParcelName] = useState('');
+  const [parcelFrom, setParcelFrom] = useState('');
+  const [parcelTo, setParcelTo] = useState('');
+  const [parcelReceiver, setParcelReceiver] = useState('');
+
+  //end parcel data
 
   const [screenInfo, setScreenInfo] = useState('');
 
@@ -79,7 +88,7 @@ export default function Connect() {
 
       console.log(parcelCode)
 
-      const transaction = await contract.createParcel(parcelCode, new Date().toLocaleString(), currentUserAddress[0], "Parcel1", "Praha", "Brno", "0x700cc0FE831dFcb65E524101DD3043aD0a008279")
+      const transaction = await contract.createParcel(parcelCode, new Date().toLocaleString(), currentUserAddress[0], parcelName, parcelFrom, parcelTo, parcelReceiver);
 
       console.log(transaction);
 
@@ -88,59 +97,7 @@ export default function Connect() {
     } catch (e) {
       console.log(e)
     }
-  }
-
-  async function updateParcelLocation() {
-    if (hasMetamask && isConnected) try {
-
-      await contract.updateParcelLocation(parcelCode, currentUserAddress[0], "Jihlava")
-
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  async function parcelInfo() {
-    if (hasMetamask && isConnected) try {
-      
-    const response = await contract.parcelInfo(parcelCode, currentUserAddress[0])
-
-    setScreenInfo(
-      `Information about parcel with code ${parcelCode}: \n
-      sender: ${response.sender}\n
-      receiver: ${response.receiver}\n
-      status: ${response.status}\n
-      current location: ${response.currentLocation}\n
-      last update: ${response.lastUpdate}\n
-      from: ${response.from}\n
-      to: ${response.to}\n`);
-    console.log(response);
-    
-
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  async function ReceiveParcel() {
-    if (hasMetamask && isConnected) try {
-      console.log(dataToChain, currentUserAddress[0])
-      await contract.submitInsuranceRequest()
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  async function getDataFromChain() {
-    const response = await contract.getAllInsuranceRequests()
-
-    let dataArray = []
-    response.forEach((data) => {
-      dataArray.push({data: data[1]})
-    })
-
-    setDataFromChain(dataArray)
-  }
+  }  
 
   function makeid(length) {
     let result = '';
@@ -156,39 +113,14 @@ export default function Connect() {
 
   return (
     <Center style={{display: "flex", justifyContent: "center", height: '100vh'}}>
+      
       {hasMetamask ? (
         isConnected ? (
 
-          <div><Center>            
+          <div>
 
-            <Button onClick={() => createParcel()}>
-              Create parcel
-            </Button>
-
-            <div>
-
-            <Button onClick={() => parcelInfo()}>
-              Get parcel
-            </Button>
-
-            <Textarea
-              value={parcelCode}
-              onChange={(event) => setParcelCode(event.currentTarget.value)}
-              placeholder={"Write your parcel code"}
-              label={"Find information about the parcel"}
-            />
-            </div>
-
-            
-
-            <Button onClick={() => updateParcelLocation()}>
-              Update parcel
-            </Button>
-
-          </Center>
-
-            <Center>
-            <div style={{ width: '500px', marginTop: '50px' }}>
+<Center>
+            <div style={{ width: '500px', margin: '50px 0px' }}>
   {screenInfo !== '' ? (
     <Alert variant="light" color="blue" title="Information" style={{ whiteSpace: 'pre-line' }}>
       {screenInfo}
@@ -197,7 +129,58 @@ export default function Connect() {
     ''
   )}
 </div>      
-            </Center></div>
+            </Center>
+
+            <Center>
+            <Textarea style={{width: "300px", margin:"8px 0px"}}
+              value={parcelName}
+              onChange={(event) => setParcelName(event.currentTarget.value)}
+              placeholder={"Write short description"}
+              label={"Parcel description"}
+            />   
+            </Center>
+
+            <Center>
+            <Textarea style={{width: "300px", margin:"8px 0px"}}
+              value={parcelFrom}
+              onChange={(event) => setParcelFrom(event.currentTarget.value)}
+              placeholder={"Write your address (Country, City, Street)"}
+              label={"Your Address"}
+            />   
+            </Center>
+
+            <Center>
+            <Textarea style={{width: "300px", margin:"8px 0px"}}
+              value={parcelTo}
+              onChange={(event) => setParcelTo(event.currentTarget.value)}
+              placeholder={"Write receiver`s address (Country, City, Street)"}
+              label={"Receiver`s address"}
+            />   
+            </Center>
+
+            <Center>
+            <Textarea style={{width: "300px", margin:"8px 0px"}}
+              value={parcelReceiver}
+              onChange={(event) => setParcelReceiver(event.currentTarget.value)}
+              placeholder={"Write receiver`s wallet"}
+              label={"Receiver`s wallet"}
+            />   
+            </Center>          
+            
+            
+          <Center> 
+
+                 
+
+            <Button onClick={() => createParcel()}>
+              Create parcel
+            </Button>
+
+            
+
+          </Center>
+
+            </div>
 
 
 
@@ -208,5 +191,6 @@ export default function Connect() {
         )
       ) : ("Download Metamask! ")}
     </Center>
+    
   )
 }

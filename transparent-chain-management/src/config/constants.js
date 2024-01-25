@@ -1,8 +1,18 @@
 module.exports = {
-    contractAddress: '0x71a4e5ab5858ba7d345ea057da8177bf3b0bdb10',
-    abi: [
+    contractAddress: '0xb008074370d3afdc865e41de85b327de4a0b226a',
+    abi:[
         {
             "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "_parcelCode",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_date",
+                    "type": "string"
+                },
                 {
                     "internalType": "address",
                     "name": "_sender",
@@ -30,14 +40,31 @@ module.exports = {
                 }
             ],
             "name": "createParcel",
-            "outputs": [
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "inputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
+                    "internalType": "string",
+                    "name": "parcelCode",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_date",
+                    "type": "string"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_receiver",
+                    "type": "address"
                 }
             ],
-            "stateMutability": "nonpayable",
+            "name": "receiveParcel",
+            "outputs": [],
+            "stateMutability": "payable",
             "type": "function"
         },
         {
@@ -61,93 +88,14 @@ module.exports = {
         {
             "inputs": [
                 {
-                    "internalType": "uint256",
+                    "internalType": "string",
                     "name": "parcelCode",
-                    "type": "uint256"
+                    "type": "string"
                 },
                 {
-                    "internalType": "address",
-                    "name": "_user",
-                    "type": "address"
-                }
-            ],
-            "name": "parcelInfo",
-            "outputs": [
-                {
-                    "components": [
-                        {
-                            "internalType": "string",
-                            "name": "name",
-                            "type": "string"
-                        },
-                        {
-                            "internalType": "string",
-                            "name": "from",
-                            "type": "string"
-                        },
-                        {
-                            "internalType": "string",
-                            "name": "to",
-                            "type": "string"
-                        },
-                        {
-                            "internalType": "string",
-                            "name": "currentLocation",
-                            "type": "string"
-                        },
-                        {
-                            "internalType": "uint256",
-                            "name": "lastUpdate",
-                            "type": "uint256"
-                        },
-                        {
-                            "internalType": "enum SupplyChainManagement.ParcelStatus",
-                            "name": "status",
-                            "type": "uint8"
-                        },
-                        {
-                            "internalType": "address",
-                            "name": "receiver",
-                            "type": "address"
-                        },
-                        {
-                            "internalType": "address",
-                            "name": "sender",
-                            "type": "address"
-                        }
-                    ],
-                    "internalType": "struct SupplyChainManagement.Parcel",
-                    "name": "",
-                    "type": "tuple"
-                }
-            ],
-            "stateMutability": "payable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "parcelCode",
-                    "type": "uint256"
-                },
-                {
-                    "internalType": "address",
-                    "name": "_receiver",
-                    "type": "address"
-                }
-            ],
-            "name": "receiveParcel",
-            "outputs": [],
-            "stateMutability": "payable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "parcelCode",
-                    "type": "uint256"
+                    "internalType": "string",
+                    "name": "_date",
+                    "type": "string"
                 },
                 {
                     "internalType": "address",
@@ -181,9 +129,75 @@ module.exports = {
         {
             "inputs": [
                 {
-                    "internalType": "uint256",
+                    "internalType": "string",
+                    "name": "parcelCode",
+                    "type": "string"
+                },
+                {
+                    "internalType": "address",
+                    "name": "_user",
+                    "type": "address"
+                }
+            ],
+            "name": "parcelInfo",
+            "outputs": [
+                {
+                    "components": [
+                        {
+                            "internalType": "string",
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "from",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "to",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "currentLocation",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "string",
+                            "name": "lastUpdate",
+                            "type": "string"
+                        },
+                        {
+                            "internalType": "enum SupplyChainManagement.ParcelStatus",
+                            "name": "status",
+                            "type": "uint8"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "receiver",
+                            "type": "address"
+                        },
+                        {
+                            "internalType": "address",
+                            "name": "sender",
+                            "type": "address"
+                        }
+                    ],
+                    "internalType": "struct SupplyChainManagement.Parcel",
                     "name": "",
-                    "type": "uint256"
+                    "type": "tuple"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
                 }
             ],
             "name": "Parcels",
@@ -209,9 +223,9 @@ module.exports = {
                     "type": "string"
                 },
                 {
-                    "internalType": "uint256",
+                    "internalType": "string",
                     "name": "lastUpdate",
-                    "type": "uint256"
+                    "type": "string"
                 },
                 {
                     "internalType": "enum SupplyChainManagement.ParcelStatus",
