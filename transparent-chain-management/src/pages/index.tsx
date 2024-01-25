@@ -10,11 +10,11 @@ const inter = Inter({ subsets: ['latin'] })
 export default function Home() {
   
   return (
-    <div style={{display: "flex", justifyContent: "space-around", alignItems:"center", margin:'0px 200px', height: '100vh'}}>
-      <Button><a href='/createparcel'>Create Parcel</a></Button>      
-      <Button><a href='/info'>Parcel Info</a></Button>
-      <Button><a href='/updateparcel'>Update Parcel</a></Button>
-      <Button><a href='/confirm'>Confirm receipt</a></Button>
+    <div style={{display: "flex", justifyContent: "center", alignItems:"center", height: '100vh'}}>
+      <Button style={{margin:"0px 40px"}}><a href='/createparcel'>Create parcel</a></Button>      
+      <Button style={{margin:"0px 40px"}}><a href='/info'>Parcel Info</a></Button>
+      <Button style={{margin:"0px 40px"}}><a href='/updateparcel'>Update parcel</a></Button>
+      <Button style={{margin:"0px 40px"}}><a href='/confirm'>Confirm parcel</a></Button>
     </div>
   );
 };
